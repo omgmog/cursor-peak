@@ -29,7 +29,7 @@
 				drawCursor = null;
 				// clear the canvas
 				ctx.clearRect(0,0,canvas.width,canvas.height);
-				if (cx > canvas.width) {
+				if (cx > 7) {
 					document.body.style.cursor = 'initial';
 				} else {
 
@@ -39,18 +39,24 @@
 
 					// load image into the canvas
 					var image = document.getElementById(img.id);
-					ctx.drawImage(image, (img.width - (cx * -2)), 0);
-					ctx.clearRect(canvas.width - cx, 0, canvas.width, canvas.height);
-					ctx.save();
+					var imageXPos = ((canvas.width - image.width) - (cx * -5)) - image.width;
+					ctx.drawImage(image, imageXPos, 0);
+
+					var clearXPos = ((canvas.width - image.width) - cx);
+					ctx.clearRect(clearXPos,0,canvas.width,canvas.height);
+					ctx.font = '10px sans-serif';
+					ctx.fillText('Oui?', 0, 20);
+					ctx.fillText('('+cx+','+cy+')',0, 40);
 
 					var imgb64 = canvas.toDataURL();
-					document.body.style.cursor = 'url('+imgb64+') '+(canvas.width)+' 0' + ', default';
+					var cursorXPos = canvas.width - (image.width);
+					document.body.style.cursor = 'url('+imgb64+') '+ cursorXPos +' 0' + ', default';
 				}
 
 				// debug output
-				ctx.font = '20px sans-serif';
-				ctx.fillText('Debug', 10, 30);
-				document.body.appendChild(canvas);
+				// ctx.font = '20px sans-serif';
+				// ctx.fillText('Debug', 10, 30);
+				// document.body.appendChild(canvas);
 
 			};
 
