@@ -29,7 +29,7 @@
 				drawCursor = null;
 				// clear the canvas
 				ctx.clearRect(0,0,canvas.width,canvas.height);
-				if (cx > 7) {
+				if (cx > (img.width /2)) {
 					document.body.style.cursor = 'initial';
 				} else {
 
@@ -39,17 +39,17 @@
 
 					// load image into the canvas
 					var image = document.getElementById(img.id);
-					var imageXPos = ((canvas.width - image.width) - (cx * -5)) - image.width;
+					var imageXPos = ((canvas.width - img.width) - (cx * -2)) - (img.width / 2);
 					ctx.drawImage(image, imageXPos, 0);
 
-					var clearXPos = ((canvas.width - image.width) - cx);
+					var clearXPos = ((canvas.width - (img.width /2)) - cx);
 					ctx.clearRect(clearXPos,0,canvas.width,canvas.height);
 					ctx.font = '10px sans-serif';
 					ctx.fillText('Oui?', 0, 20);
 					ctx.fillText('('+cx+','+cy+')',0, 40);
 
 					var imgb64 = canvas.toDataURL();
-					var cursorXPos = canvas.width - (image.width);
+					var cursorXPos = canvas.width - (img.width / 2);
 					document.body.style.cursor = 'url('+imgb64+') '+ cursorXPos +' 0' + ', default';
 				}
 
