@@ -1,76 +1,93 @@
 <!DOCTYPE html>
 <html>
+
 <head>
-	<meta charset="utf-8">
-	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<title></title>
-	<style>
-		html,body { width: 100%; height: 100%; margin: 0; padding: 0; }
-	</style>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title></title>
+    <style>
+    html,
+    body {
+        width: 100%;
+        height: 100%;
+        margin: 0;
+        padding: 0;
+    }
+    </style>
 </head>
+
 <body>
-	<div style="display: none;">
-		<img src="peak.png" id="img">
-	</div>
-	<script>
-		(function () {
-			var img = {
-				id: 'img',
-				width: 56,
-				height: 128
-			};
-			var canvas = document.createElement('canvas');
-			canvas.width = canvas.height = 128;
-			var ctx = canvas.getContext('2d');
+    <div style="display: none;">
+        <img src="peak.png" id="img">
+    </div>
+    <script>
+    (function() {
+        var img = {
+            id: 'img',
+            width: 56,
+            height: 128
+        };
+        var canvas = document.createElement('canvas');
+        canvas.width = canvas.height = 128;
+        var ctx = canvas.getContext('2d');
 
-			var cx, cy, x, y, drawCursor;
+        var cx, cy, x, y, drawCursor;
 
-			var updateCursor = function (time) {
-				drawCursor = null;
-				// clear the canvas
-				ctx.clearRect(0,0,canvas.width,canvas.height);
-				if (cx > (img.width /2)) {
-					document.body.style.cursor = 'initial';
-				} else {
+        var updateCursor = function(time) {
+            drawCursor = null;
 
-					// debug draw a red square behind the image
-					ctx.fillStyle = 'red';
-					// ctx.fillRect(0,0,canvas.width,canvas.height);
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            if (cx > img.width) {
+                document.body.style.cursor = 'initial';
+            } else {
+                var image = document.getElementById(img.id);
+                var imageXPos = ((canvas.width - img.width / 2) - (cx * -1)) - img.width;
+                ctx.drawImage(image, imageXPos, 0);
 
-					// load image into the canvas
-					var image = document.getElementById(img.id);
-					var imageXPos = ((canvas.width - img.width) - (cx * -2)) - (img.width / 2);
-					ctx.drawImage(image, imageXPos, 0);
+                var clearXPos = (canvas.width - (img.width / 2)) - cx;
+                ctx.clearRect(clearXPos, 0, canvas.width, canvas.height);
 
-					var clearXPos = ((canvas.width - (img.width /2)) - cx);
-					ctx.clearRect(clearXPos,0,canvas.width,canvas.height);
-					ctx.font = '10px sans-serif';
-					ctx.fillText('Oui?', 0, 20);
-					ctx.fillText('('+cx+','+cy+')',0, 40);
+                ctx.fillStyle = 'black';
+                ctx.font = '10px sans-serif';
+                ctx.fillText('Oui?', 0, 20);
+                ctx.fillText('(' + cx + ',' + cy + ')', 0, 40);
 
-					var imgb64 = canvas.toDataURL();
-					var cursorXPos = canvas.width - (img.width / 2);
-					document.body.style.cursor = 'url('+imgb64+') '+ cursorXPos +' 0' + ', default';
-				}
+                var shadowWidth = 6;
+                var renderShadow = function(width) {
+                    var imageData = ctx.getImageData(clearXPos - width, 0, width, canvas.height);
+                    for (var i = 0; i < imageData.data.length; i += 4) {
+                        if (imageData.data[i + 3] === 255) {
+                            imageData.data[i] = imageData.data[i] * .75;
+                            imageData.data[i + 1] = imageData.data[i + 1] * .75;
+                            imageData.data[i + 2] = imageData.data[i + 2] * .75;
+                        }
+                    }
+                    ctx.putImageData(imageData, clearXPos - width, 0);
+                    width -= 3;
+                    if (width > 0) {
+                        renderShadow(width);
+                    }
+                }
+                renderShadow(shadowWidth);
 
-				// debug output
-				// ctx.font = '20px sans-serif';
-				// ctx.fillText('Debug', 10, 30);
-				// document.body.appendChild(canvas);
+                var imgb64 = canvas.toDataURL();
+                var cursorXPos = canvas.width - (img.width / 2);
+                document.body.style.cursor = 'url(' + imgb64 + ') ' + cursorXPos + ' 0' + ', default';
+            }
+        };
 
-			};
+        document.body.addEventListener('mousemove', function(e) {
+            cx = e.clientX;
+            cy = e.clientY;
+            x = cx / window.innerWidth;
+            y = cy / window.innerHeight;
 
-			document.body.addEventListener('mousemove', function (e) {
-				cx = e.clientX;
-				cy = e.clientY;
-				x = cx / window.innerWidth;
-				y = cy / window.innerHeight;
-
-				if (!drawCursor) drawCursor = requestAnimationFrame(function () {
-					updateCursor(cx);
-				});
-			});
-		}());
-	</script>
+            if (!drawCursor) drawCursor = requestAnimationFrame(function() {
+                updateCursor(cx);
+            });
+        });
+    }());
+    </script>
 </body>
+
 </html>
