@@ -29,22 +29,27 @@
 				drawCursor = null;
 				// clear the canvas
 				ctx.clearRect(0,0,canvas.width,canvas.height);
+				if (cx > canvas.width) {
+					document.body.style.cursor = 'initial';
+				} else {
 
-				// debug draw a red square behind the image
-				// ctx.fillStyle = 'red';
-				// ctx.fillRect(0,0,canvas.width,canvas.height);
+					// debug draw a red square behind the image
+					ctx.fillStyle = 'red';
+					// ctx.fillRect(0,0,canvas.width,canvas.height);
 
-				// load image into the canvas
-				var image = document.getElementById(img.id);
-				ctx.drawImage(image, (128 - cx - image.width - 2), 0);
-				// ctx.clearRect(cx,0,(img.width - cx), img.height);
-				ctx.save();
+					// load image into the canvas
+					var image = document.getElementById(img.id);
+					ctx.drawImage(image, (img.width - (cx * -2)), 0);
+					ctx.clearRect(canvas.width - cx, 0, canvas.width, canvas.height);
+					ctx.save();
 
-				var imgb64 = canvas.toDataURL();
-				var urlstring = cx < 128 ? 'url('+imgb64+') 128 0' : 'pointer';
-				document.body.style.cursor = urlstring + ', crosshair';
+					var imgb64 = canvas.toDataURL();
+					document.body.style.cursor = 'url('+imgb64+') '+(canvas.width)+' 0' + ', default';
+				}
 
 				// debug output
+				ctx.font = '20px sans-serif';
+				ctx.fillText('Debug', 10, 30);
 				document.body.appendChild(canvas);
 
 			};
@@ -55,7 +60,9 @@
 				x = cx / window.innerWidth;
 				y = cy / window.innerHeight;
 
-				if (!drawCursor) drawCursor = requestAnimationFrame(updateCursor);
+				if (!drawCursor) drawCursor = requestAnimationFrame(function () {
+					updateCursor(cx);
+				});
 			});
 		}());
 	</script>
