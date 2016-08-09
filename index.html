@@ -1,73 +1,63 @@
 <!DOCTYPE html>
-
-<!-- https://github.com/benfoxall/cursory-hack/ -->
-
 <html>
-  <head>
-    <meta charset="utf-8">
-    <title>cursory hack</title>
-    <style media="screen">
-      body {height:100vh}
-    </style>
-  </head>
-  <body>
-    <script type="text/javascript">
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<title></title>
+	<style>
+		html,body { width: 100%; height: 100%; margin: 0; padding: 0; }
+	</style>
+</head>
+<body>
+	<div style="display: none;">
+		<img src="peak.png" id="img">
+	</div>
+	<script>
+		(function () {
+			var img = {
+				id: 'img',
+				width: 56,
+				height: 128
+			};
+			var canvas = document.createElement('canvas');
+			canvas.width = canvas.height = 128;
+			var ctx = canvas.getContext('2d');
 
-      // limit for cursor size is 128
-      var canvas = document.createElement('canvas')
-      canvas.width = canvas.height = 128
+			var cx, cy, x, y, drawCursor;
 
-      var ctx = canvas.getContext('2d')
-      ctx.fillStyle = 'rgba(255,0,100,0.8)'
-      ctx.strokeStyle = 'rgba(255,0,100,0.5)'
+			var updateCursor = function (time) {
+				drawCursor = null;
+				// clear the canvas
+				ctx.clearRect(0,0,canvas.width,canvas.height);
 
+				// debug draw a red square behind the image
+				// ctx.fillStyle = 'red';
+				// ctx.fillRect(0,0,canvas.width,canvas.height);
 
-      var cx, cy, x, y, animation
+				// load image into the canvas
+				var image = document.getElementById(img.id);
+				ctx.drawImage(image, (128 - cx - image.width - 2), 0);
+				// ctx.clearRect(cx,0,(img.width - cx), img.height);
+				ctx.save();
 
-      document.body.addEventListener('mousemove', function(e){
-        cx = e.clientX
-        cy = e.clientY
-        x = cx / window.innerWidth
-        y = cy / window.innerHeight
+				var imgb64 = canvas.toDataURL();
+				var urlstring = cx < 128 ? 'url('+imgb64+') 128 0' : 'pointer';
+				document.body.style.cursor = urlstring + ', crosshair';
 
-        if(!animation) animation = requestAnimationFrame(animate)
-      })
+				// debug output
+				// document.body.appendChild(canvas);
 
-      function animate(time){
-        animation = null
+			};
 
-        ctx.clearRect(0,0,128,128)
+			document.body.addEventListener('mousemove', function (e) {
+				cx = e.clientX;
+				cy = e.clientY;
+				x = cx / window.innerWidth;
+				y = cy / window.innerHeight;
 
-        // THIS IS SUPER UGLY,
-        // BUT YOU GET THE IDEA, YEAH?
-
-        var angle = Math.atan2(x-.5, y-.5)
-        var extent = Math.max(Math.abs(x-.5), Math.abs(y-.5)) * 2
-
-        ctx.save()
-        ctx.translate(64, 64)
-        ctx.rotate(-angle)
-        ctx.translate(-64, -64)
-
-        ctx.beginPath()
-        ctx.arc(64,64 + (54*extent),10,0,Math.PI*2)
-        ctx.fill()
-
-        ctx.beginPath()
-        ctx.moveTo(64,64 + (54*extent))
-        ctx.lineTo(64,(1-extent) * 64)
-        ctx.stroke()
-
-
-        ctx.restore()
-
-        var url = canvas.toDataURL()
-
-        document.body.style.cursor = 'url('+url+') '+(1-x)*128+' '+(1-y)*128+', crosshair'
-      }
-
-
-
-    </script>
-  </body>
+				if (!drawCursor) drawCursor = requestAnimationFrame(updateCursor);
+			});
+		}());
+	</script>
+</body>
 </html>
